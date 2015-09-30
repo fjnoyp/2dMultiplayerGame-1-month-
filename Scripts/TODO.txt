@@ -1,0 +1,1 @@
+//issue with projectile explosion synchronization, whenever a client throws a projectile at another, there is too much lag between hit register of that client and then registering that collision on other client 

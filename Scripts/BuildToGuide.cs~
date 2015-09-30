@@ -1,0 +1,10 @@
+//-*- java -*-
+
+/*
+Attach to BuildGuides to tell the DestructibleObjectManager
+how to create the given BuildGuide
+*/
+
+public class BuildToGuide{
+       public String
+}

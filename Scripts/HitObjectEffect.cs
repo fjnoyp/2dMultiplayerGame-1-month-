@@ -1,0 +1,33 @@
+//-*-java-*-
+using UnityEngine;
+
+public class HitObjectEffect : AbObjectEffect{   
+    public int knockback; //220
+    public float damage; //100 
+    //public GameObject explosion; //prefab of explosion effect 
+    
+    //pos = position of collision 
+    //dir = direction of projectile 
+    override public void EffectGO(GameObject gObj, Vector2 pos, Vector2 dir){
+	if(gObj.tag == "Player"){
+	    PlayerNetwork pNet = gObj.GetComponent<PlayerNetwork>(); 
+
+	    /*
+	    //Only inflict collisioneffects if the player the bullet hits 
+	    //is ours 
+	    if( pNet.photonView.isMine && 
+		!projectileManager.photonView.isMine){
+	    */
+		pNet.photonView.RPC("ApplyForceDamage",PhotonTargets.All,
+				    new object[]{dir*knockback,damage}); 
+	}
+	//this.ExplosionAt(pos,Mathf.Tan(dir.y/dir.x)); 
+
+    }
+    /*
+    override public void ExplosionAt(Vector2 position, float rotation){
+	Quaternion quaternion = Quaternion.Euler(0f, 0f, rotation); 
+	Instantiate(explosion, position, quaternion); 
+    }
+    */
+}

@@ -1,0 +1,35 @@
+//-*- java -*-
+using UnityEngine; 
+
+public class DestructibleObjectManager : MonoBehaviour{
+
+    //determining which objects are neighbors of the other? 
+    public GameObject basicBlock; 
+
+    void Start(){
+        GameObject[] toBuilds = GameObject.FindGameObjectsWithTag("BuildGuide");
+        
+	//TO DO: Note future optimization possible here, 
+	//ONLY CREATE THE CUBES WHEN NECESARY...
+
+	//Use BuildGuides to construct scene 
+        foreach (GameObject toBuild in toBuilds){
+	    BuildToGuide buildGuide = toBuild.GetComponent<BuildToGuide>(); 
+	    string buildType = buildGuide.GetBuildToType(); 
+	    Vector2[,] buildPos = buildGuide.GetBuildPositions(1.0f); 
+
+	    for(int y = 0; y<buildPos.GetLength(0); y++){
+		for(int x = 0; x<buildPos.GetLength(1); x++){
+		    Instantiate(basicBlock, (Vector3)buildPos[y,x], 
+				Quaternion.identity); 
+		}
+	    }
+
+	}
+
+	//Destroy  BuildGuides
+	foreach (GameObject toBuild in toBuilds){
+	    Destroy(toBuild); 
+	}
+    }
+}

@@ -1,0 +1,204 @@
+﻿//-*-java-*-
+using UnityEngine;
+using System.Collections;
+
+using Enums; 
+
+//Layers are for selective collisions/raycasts 
+
+
+//Controls player input->movement, all animation behavior 
+
+//NEED TO SYNCH: 
+//CharacterAnim
+//Position
+//Velocity (only used for 2d collision force detection)  
+
+
+
+//Manage user input for MOVEMENT only, manage force -> movement 
+public class PlayerControl : MonoBehaviour{
+    //TO SYNCH 
+    [HideInInspector]
+	public CharacterAnim curAnim;
+    [HideInInspector] 
+	public Vector2 velocity; 
+
+    //SYNCH ONCE 
+    [HideInInspector]
+	public bool isControllable = false; 
+    
+    //Client side management 
+    [HideInInspector]
+	public bool facingRight = true;
+
+    [HideInInspector]
+	// public bool jump = false; //check if jumping 
+    private bool grounded = false;		       
+
+    //Movement force 
+    public float moveForce = 365f; 
+    public float maxSpeed = 5f;
+    public float jumpForce = 1000f;
+
+    private float jumpTimeout = .3f; 
+    private float lastJumpButtonTime = -10.0f; 
+    private bool jumpPlayed; //track if jump animation was played 
+
+    //Audio 
+    public AudioClip[] jumpClips;
+
+    //Required references to other GameObject components 
+    public Transform groundCheck; 
+    public Animator anim; 
+
+    
+    //For allowing user to go through platforms 
+    [HideInInspector] 
+    public bool movingDown; 
+
+    //public Rigidbody2D rBody; 
+
+    /*
+    private bool animPlayed = true; 
+
+    public void SetCurAnim( CharacterAnim curAnim ){
+	this.curAnim = curAnim; 
+	this.animPlayed = false; 
+    }
+    */
+
+    void Update(){
+	//Allow user to "move down" through platforms 
+	if(Input.GetKeyUp("s")){
+	    movingDown = false; 
+	}
+	else if(Input.GetKeyDown("s")){
+	    movingDown = true; 
+	}
+
+	//Jump =====================================
+	//allow user to prepare jump before landing on ground
+	if(Input.GetButtonDown("Jump")){
+	    lastJumpButtonTime = Time.time; 
+	}
+	//Jump if possible
+	if(grounded && Time.time <= lastJumpButtonTime + jumpTimeout){
+	    int i = Random.Range(0, jumpClips.Length);
+	    AudioSource.PlayClipAtPoint(jumpClips[i], transform.position);
+
+	    // Add a vertical force to the player.
+	    rigidbody2D.AddForce(new Vector2(0f, jumpForce));
+
+	    //this.curAnim = CharacterAnim.Jump; 
+
+	    lastJumpButtonTime = -10.0f; 
+	}
+    }
+
+    void ApplyUserInputForce(){  
+
+	    // Cache the horizontal input.
+	    float h = Input.GetAxis("Horizontal");
+	    if(h!=0)
+		UpdateFaceDir( h>0 ); 
+
+
+	    // If the player is changing direction (h has a different sign to velocity.x) or hasn't reached maxSpeed yet...
+	    if(h * rigidbody2D.velocity.x < maxSpeed)
+		rigidbody2D.AddForce(Vector2.right * h * moveForce);
+
+	    // If the player's horizontal velocity is greater than the maxSpeed...
+	    if(Mathf.Abs(rigidbody2D.velocity.x) > maxSpeed)
+		// ... set the player's velocity to the maxSpeed in the x axis.
+		rigidbody2D.velocity = new Vector2(Mathf.Sign(rigidbody2D.velocity.x) * maxSpeed, rigidbody2D.velocity.y);
+
+
+
+
+	    //Update velocity for animation 
+	    this.velocity = rigidbody2D.velocity; 
+	}  
+
+	//ANIMATE , APPLY FORCES 
+    void FixedUpdate (){
+
+	    //used in anim and player control 
+	this.grounded = IsGrounded(); 
+
+	    //force sliding down 
+	    if(!grounded){
+	        transform.position = transform.position + new Vector3(0,-.01f,0);
+	    }
+
+	    //Apply input ==========================================
+	    //Manage input, apply forces if is our character
+	    if(isControllable){
+		ApplyUserInputForce(); 
+	    }
+	    //Apply animation ====================================
+
+	    /*
+	    //Other animations 
+	    if(!animPlayed){
+		if( curAnim == CharacterAnim.Melee ){
+		    anim.SetTrigger("Melee"); 
+		}
+		if( curAnim == CharacterAnim.Shoot ){
+		    anim.SetTrigger("Shoot"); 
+		}
+		animPlayed = true; 
+	    }
+	    */
+
+	    //Jump 
+	    if( !grounded && !jumpPlayed ){
+		anim.SetTrigger("Jump"); 
+		jumpPlayed = true; 
+	    }
+	    if( grounded ){
+		jumpPlayed = false; 
+	    }
+
+	    anim.SetFloat("Speed", Mathf.Abs(this.velocity.x)); 
+
+	    /*
+	    if(this.velocity.x > 1 && !facingRight){
+		Flip();
+		facingRight = true; 
+	    }
+	    else if(this.velocity.x < -1 && facingRight){
+		Flip();
+		facingRight = false; 
+	    }
+	    */
+	}
+	
+	public void Flip ()
+	{
+		// Switch the way the player is labelled as facing.
+		facingRight = !facingRight;
+
+		Vector3 theScale = transform.localScale;
+		theScale.x *= -1;
+		transform.localScale = theScale;
+	}
+
+	public void UpdateFaceDir(bool faceRight){
+	    if(faceRight && !facingRight){
+		Flip();
+		facingRight = true; 
+	    }
+	    else if(!faceRight && facingRight){
+		Flip(); 
+		facingRight = false; 
+	    }
+	}
+
+	public bool IsGrounded(){
+	    return Physics2D.Linecast(transform.position,
+				      groundCheck.position, 
+				      1 << LayerMask.NameToLayer("Environment"));  
+	}
+
+}

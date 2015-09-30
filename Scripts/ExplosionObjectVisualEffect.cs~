@@ -1,0 +1,8 @@
+//-*-java-*-
+using UnityEngine; 
+
+public class ExplosionObjectVisualEffect : MonoBehaviour {
+    override public void StartEffect(GameObject gObj, Vector2 pos, Vector2 dir){
+
+}
+	}

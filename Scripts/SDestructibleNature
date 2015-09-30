@@ -1,0 +1,7 @@
+//-*- java -*-
+using UnityEngine;
+
+public class SDestructibleNature : MonoBehaviour{
+       
+
+}

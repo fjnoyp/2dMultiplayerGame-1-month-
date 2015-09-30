@@ -1,0 +1,18 @@
+//-*-java-*-
+using UnityEngine;
+
+public class AudioTrigger : MonoBehaviour{
+       public Audio audio;
+       public Collider2D trigger; 
+
+       void OnTriggerEnter2D(Collider2D col){
+       if(col.gameObject.tag == "Player" && col.gameObject.GetComponent<PlayerNetwork>().photonView.isMine){
+
+}
+       void OnTriggerExit2D(Collider2D col){
+       if(col.gameObject.tag == "Player" && col.gameObject.GetComponent<PlayerNetwork>().photonView.isMine){
+
+}
+
+}
+}

@@ -1,0 +1,16 @@
+//-*-java-*-
+using UnityEngine; 
+
+public abstract class AudioEffectOnEnter : MonoBehaviour {
+
+       public string[] activationTags; 
+       public AudioClip[] audioClips; 
+
+       void OnCollisionEnter2D(Collision2D coll){
+
+       for(int i = 0; i<activationTags.Length; i++){
+       if(activationTags[i] == coll.gameO
+}
+
+}
+}

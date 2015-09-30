@@ -1,0 +1,9 @@
+
+//-*-java-*-
+using UnityEngine;
+
+public class PrefabID : MonoBehaviour{
+       public int prefabID; 
+
+       public GetPrefabID(){ return prefabID; } 
+}

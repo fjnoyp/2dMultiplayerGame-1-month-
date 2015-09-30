@@ -1,0 +1,19 @@
+//-*-java-*-
+
+namespace{
+    
+    public class PlayerIDManager{
+	
+	
+	
+	[RPC]
+	public void AssignPlayerID(int playerID, GameObject gObj){
+	    
+	}
+
+	public GameObject GetPlayerFromID(int playerID){
+
+	}
+    }
+    
+}

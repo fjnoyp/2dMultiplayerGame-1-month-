@@ -1,0 +1,74 @@
+-*- java -*- 
+[RPC]
+    public void OnShoot(Vector3 position, Quaternion rotation, int projectileId, PhotonMessageInfo info){
+    double timestamp = PhotonNetwork.time;
+       
+    if(info!=null){
+	timestamp = info.timestamp; 
+    }
+    CreateProjectile(position,rotation,timestamp,projectileId); 
+}
+
+public void CreateProjectile(Vector3 position, Quaternion rotation, double createTime, int projectileId){
+    m_LastShootTime = Time.realtimeSinceStartup;
+    GameObject newProjectileObject = (GameObject)Instantiate(Resources.Load<GameObject>("Laser1", new Vector3(...)));
+    newProjectileObject.name = "ZZZ_"+newProjectileObject.nam; 
+
+    ProjectileBase newProjectile = new ProjectileObject.GetComponent<ProjectileBase>();
+    newProjectile.SetCreationTime(createTime); 
+    newProjectile.SetStartPosition(position);
+    newProjectile.SetProjectileId(projectileId);
+    newProjectile.SetOwner( Ship ); //same across all clients (RPC calls only on its instances in all clients) 
+
+    //data structure for storing all projectiles 
+    m_Projectiles.Add(newProjectile); 
+}
+
+public class ProjectileBase{
+    void Update(){
+	float timePassed = (float)(PhotonNetwork.time - m_CreationTime );
+	transform.position = m_StartPosition + transform.forward*speed*timePassed;
+	if(timePassed > LifeTime ){
+	    Destroy(gameObject); 
+	}
+	if(transform.position.y < 0f){
+	    Destroy(gameObject); 
+	    CreateHitFx(); 
+	}
+    }
+    void OnCollisionEnter(Collision collision){
+	if(collision.collider.tag == "Obstacle"){
+	    OnProjectileHit(); 
+	}
+	else if(collision.collider.tag == "Ship"){
+	    Ship ship = collision.collider.GetComponent<Ship>(); 
+	    //NOTE: each client manages collisions with itself! 
+	    if(ship.Team != m_Owner.Team && ship.PhotonView.isMine == true){
+		ship.ShipCollision.OnProjectileHit(this);
+		OnProjectileHit(); 
+		m_Owner.ShipShooting.SendProjectileHit(m_ProjectileId); 
+	    }
+	}
+    }
+}
+
+//but this would be on the client who is hit ... 
+public class ShipShooting{
+    public void SendProjectileHit(int projectileId){
+	if(PhotonNetwork.offlineMode == true){
+	    OnProjectileHit(projectileId); 
+	}
+	else{
+	    //Let everyone else know projectile hit 
+	    PhotonView.RPC("OnProjectileHit",PhotonTargets.Others,new object[]{projectileId}); 
+	}
+    }
+    public void OnProjectileHit(int projectileId){
+	m_Projectiles.RemoveAll( ~~projectileId); 
+    }
+}
+
+
+//jump problem between two computers 
+//hits forces the other player to look in the wrong direction
+//raycast on rocket spawns 

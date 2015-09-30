@@ -1,0 +1,12 @@
+//-*-java-*-
+using UnityEngine;
+
+public class KillZone : MonoBehaviour{
+       void OnTriggerEnter2D(Collider2D other){
+       if(other.gameObject.tag == "Player"){
+       pNet.photonView.RPC("ApplyForceDamage",PhotonTargets.All, new object[]{0,100000}); 
+       else
+       Destroy(other.gameObject); 
+}
+}
+}

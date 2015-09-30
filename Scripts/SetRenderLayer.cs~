@@ -1,0 +1,10 @@
+using UnityEngine; 
+public class SetRenderLayer : MonoBehaviour{
+       String desiredLayer;   
+String component; 
+
+       void Start(){
+       if(component == "ParticleSystem"); 
+       particleSystem.renderer.sortingLayerName = desiredLayer; 
+}
+}

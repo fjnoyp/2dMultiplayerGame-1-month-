@@ -1,0 +1,15 @@
+//-*-java-*-
+public static class Enums{
+
+//Control animation playing with an int "CharacterAnim"
+public enum CharacterAnim{
+    Idle = 0,
+    Jump = 1,
+    Run = 2,
+    Shoot = 3,
+    Falling = 4,
+    Death = 5,
+    AnyState = 6, 
+}
+
+}
